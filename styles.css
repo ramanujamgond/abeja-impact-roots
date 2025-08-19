@@ -325,7 +325,7 @@ body {
 .logo h1 {
     font-size: 1.25rem;
     font-weight: bold;
-    color: var(--color-primary);
+    color: white;
 }
 
 .nav-links {
@@ -337,7 +337,7 @@ body {
 .nav-link {
     background: none;
     border: none;
-    color: var(--color-foreground);
+    color: white;
     cursor: pointer;
     font-family: inherit;
     font-size: 0.875rem;
