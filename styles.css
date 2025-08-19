@@ -291,6 +291,18 @@ body {
     box-shadow: var(--shadow-soft);
 }
 
+.header.scrolled .logo h1 {
+    color: var(--color-primary);
+}
+
+.header.scrolled .nav-link {
+    color: var(--color-foreground);
+}
+
+.header.scrolled .mobile-menu-btn {
+    color: var(--color-foreground);
+}
+
 .trust-bar {
     background-color: var(--color-primary);
     color: var(--color-primary-foreground);
