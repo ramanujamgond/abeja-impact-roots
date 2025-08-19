@@ -144,34 +144,75 @@ function setupFormValidation() {
     }
 }
 
-function handleFormSubmit(event) {
-    event.preventDefault();
-    
-    const formData = new FormData(event.target);
-    const name = formData.get('name');
-    const email = formData.get('email');
-    const organization = formData.get('organization');
-    const interest = formData.get('interest');
-    const message = formData.get('message');
-    
-    // Create mailto link
-    const subject = `Contact from ${name} - ${interest || 'General Inquiry'}`;
-    const body = `Name: ${name}
-Email: ${email}
-Organization: ${organization || 'Not specified'}
-Interest: ${interest || 'General Inquiry'}
+async function handleFormSubmit(event) {
+  event.preventDefault();
+  const form = event.target;
+  const formData = new FormData(form);
 
-Message:
-${message}`;
-    
-    const mailtoLink = `mailto:swosti@mye.farm?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailtoLink);
-    
-    // Show confirmation (you could replace this with a toast notification)
-    alert('Thank you for your message! Your email client should now open with a pre-filled email.');
-    
-    // Reset form
-    event.target.reset();
+  // Basic Validation
+  const name = formData.get('name').trim();
+  const email = formData.get('email').trim();
+  const message = formData.get('message').trim();
+  const interest = formData.get('interest');
+
+  if (!name || !email || !message || !interest) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Please fill out all required fields.',
+    });
+    return;
+  }
+
+  // Email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Invalid Email',
+      text: 'Please enter a valid email address.',
+    });
+    return;
+  }
+
+  // Basic Sanitization (remove HTML tags)
+  const sanitizedMessage = message.replace(/<[^>]*>?/gm, '');
+  formData.set('message', sanitizedMessage);
+
+  try {
+    const response = await fetch(form.action, {
+      method: form.method,
+      body: formData,
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Message Sent!',
+        text: 'Thank you for contacting us. We will get back to you shortly.',
+      });
+      form.reset();
+    } else {
+      const responseData = await response.json();
+      const errorMessage =
+        responseData.errors?.map((err) => err.message).join(', ') ||
+        'An unknown error occurred.';
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission Error',
+        text: errorMessage,
+      });
+    }
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Network Error',
+      text: 'Could not send message. Please check your internet connection and try again.',
+    });
+  }
 }
 
 // Donation functionality
